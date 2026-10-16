@@ -22,7 +22,7 @@ Specifically, we examine two regimes:
 To isolate the contribution of structural inductive bias, we evaluate three controlled architectures sharing identical classification heads and loss objectives across primary Enzyme Commission (EC 1–6) classes:
 
 - **Model A (Sequence Only):** Frozen ESM-2 (`esm2_t12_35M_UR50D`) mean-pooled representations ($480\text{d}$) $\rightarrow$ 2-layer MLP classifier.
-- **Model B (Structure Only):** Residue-level $C_\alpha$ contact graph ($r \le 8.0\text{ \AA}$) with backbone dihedral angles ($\phi, \psi$) $\rightarrow$ Edge-conditioned message-passing GNN $\rightarrow$ Global pooling $\rightarrow$ MLP classifier.
+- **Model B (Structure Only):** Residue-level $C_\alpha$ contact graph ($r \le 8.0\text{ }$) with backbone dihedral angles ($\phi, \psi$) $\rightarrow$ Edge-conditioned message-passing GNN $\rightarrow$ Global pooling $\rightarrow$ MLP classifier.
 - **Model C (Sequence–Structure Hybrid):** Per-residue ESM-2 token embeddings ($480\text{d}$) mapped as initial node features in the $C_\alpha$ contact graph $\rightarrow$ Edge-conditioned message-passing GNN $\rightarrow$ Global pooling $\rightarrow$ MLP classifier.
 
 ## Benchmark Results (5-Fold Cluster-Disjoint Cross-Validation, <30% Sequence Identity)
