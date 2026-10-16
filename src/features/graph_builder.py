@@ -1,4 +1,3 @@
-%%writefile /kaggle/working/protein_benchmark/src/features/graph_builder.py
 from typing import Dict, Any, Optional
 import numpy as np
 import torch
