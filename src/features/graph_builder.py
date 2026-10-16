@@ -1,4 +1,3 @@
-# src/features/graph_builder.py (Enhanced Geometric Node Features)
 import torch
 import numpy as np
 import Bio.PDB
