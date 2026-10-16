@@ -1,11 +1,10 @@
-from typing import Dict, List
+from typing import Dict, List, Any
 import networkx as nx
 import numpy as np
 import pandas as pd
 from Bio import Align
 
 class SequenceClusterSplitter:
-    """Computes pairwise sequence identity and single-linkage clusters."""
     def __init__(self, cutoff: float = 0.30):
         self.cutoff = cutoff
 
@@ -36,7 +35,6 @@ class SequenceClusterSplitter:
                 id_matrix[i, j] = id_matrix[j, i] = float(identity)
         return id_matrix
 
-
 def generate_kfold_cluster_splits(
     df: pd.DataFrame, 
     identity_matrix: np.ndarray, 
@@ -45,8 +43,9 @@ def generate_kfold_cluster_splits(
     seed: int = 42
 ) -> List[Dict[str, Any]]:
     """
-    Distributes single-linkage sequence clusters across k disjoint folds using greedy bin packing.
-    Guarantees no sequence in fold i shares >= cutoff identity with fold j.
+    Distributes single-linkage clusters across k disjoint folds.
+    If k_folds >= 3, partitions into train, val, and test.
+    If k_folds == 2, partitions into train and test.
     """
     n = len(df)
     g = nx.Graph()
@@ -63,7 +62,7 @@ def generate_kfold_cluster_splits(
     folds = [[] for _ in range(k_folds)]
     fold_sizes = [0] * k_folds
 
-    # Greedy bin-packing: assign largest clusters first
+    # Greedy bin packing: allocate largest clusters first
     sorted_clusters = sorted(clusters, key=len, reverse=True)
     for c in sorted_clusters:
         idx = int(np.argmin(fold_sizes))
@@ -73,12 +72,23 @@ def generate_kfold_cluster_splits(
     splits = []
     for i in range(k_folds):
         test_indices = folds[i]
-        val_indices = folds[(i + 1) % k_folds]
-        train_indices = [
-            idx for fold_idx, f in enumerate(folds) 
-            if fold_idx not in (i, (i + 1) % k_folds) 
-            for idx in f
-        ]
+        
+        if k_folds >= 3:
+            val_indices = folds[(i + 1) % k_folds]
+            excluded_folds = {i, (i + 1) % k_folds}
+            train_indices = [
+                idx for fold_idx, f in enumerate(folds) 
+                if fold_idx not in excluded_folds 
+                for idx in f
+            ]
+        else:
+            # Fallback for K=2
+            val_indices = []
+            train_indices = [
+                idx for fold_idx, f in enumerate(folds) 
+                if fold_idx != i 
+                for idx in f
+            ]
 
         splits.append({
             "fold": i,
