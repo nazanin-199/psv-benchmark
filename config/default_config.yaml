@@ -1,0 +1,33 @@
+experiment:
+  name: "protein_structure_value_benchmark"
+  seed: 42
+  device: "cuda"
+
+data:
+  raw_pdb_dir: "/kaggle/working/protein_benchmark/data/raw_pdbs"
+  cache_dir: "/kaggle/working/protein_benchmark/data/cached_embeddings"
+  checkpoint_dir: "/kaggle/working/protein_benchmark/checkpoints"
+  manifest_path: "/kaggle/working/protein_benchmark/data/curated_manifest.csv"
+  max_seq_len: 512
+  min_seq_len: 30
+  cluster_identity_cutoff: 0.30
+  n_folds: 5
+
+features:
+  esm_model_name: "esm2_t12_35M_UR50D"
+  contact_distance_cutoff: 8.0
+  use_dihedral_features: true
+
+models:
+  hidden_dim: 128
+  num_gnn_layers: 2
+  dropout: 0.2
+  num_classes: 6
+
+training:
+  epochs: 45
+  lr_seq: 0.001
+  lr_struct: 0.0005     # Calibrated learning rate for GNN from scratch
+  lr_hybrid: 0.0003     # Conservative learning rate to preserve ESM embeddings
+  weight_decay: 0.0001
+  warmup_epochs: 5
